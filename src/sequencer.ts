@@ -3,9 +3,8 @@ import { Grid } from './grid'
 // reusable stone class
 export class Sequencer {
   offset: Vector3
-  public cells: number | null[][][]
+  public cells: number | null[][]
   size: Vector3
-  grid: Grid
 
   constructor(offset: Vector3, size: Vector3, grid: Grid) {
     this.offset = new Vector3(
@@ -14,15 +13,13 @@ export class Sequencer {
       offset.z + grid.offset.z
     )
     this.size = size
-    this.grid = grid
 
     this.cells = []
     for (let x = this.offset.x; x < size.x + this.offset.x; x++) {
       this.cells[x] = []
       for (let y = this.offset.y; y < size.y + this.offset.y; y++) {
-        this.cells[x][y] = []
         for (let z = this.offset.z; z < size.z + this.offset.z; z++) {
-          this.cells[x][y][z] = null
+          this.cells[x][z] = null
         }
       }
     }
