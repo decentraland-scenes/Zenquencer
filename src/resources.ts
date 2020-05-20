@@ -3,7 +3,7 @@ import utils from '../node_modules/decentraland-ecs-utils/index'
 export default {
   models: {
     baseScene: new GLTFShape('models/baseScene.glb'),
-    plate: new GLTFShape('models/baseScene.glb'),
+    plate: new GLTFShape('models/Plate_01/Plate_01.glb'),
     stone1: new GLTFShape('models/SpiralStone_01/SpiralStone_01.glb'),
   },
   sounds: {

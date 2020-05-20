@@ -1,13 +1,14 @@
-import utils from '../node_modules/decentraland-ecs-utils/index'
+//import utils from '../node_modules/decentraland-ecs-utils/index'
 
 export const sceneMessageBus = new MessageBus()
+
+export let seqNumbers: number[][] = []
 
 export let stones: MusicalStone[] = []
 
 // reusable stone class
 export class MusicalStone extends Entity {
   note: number
-  isClone: boolean = false
 
   constructor(
     shape: GLTFShape,
@@ -33,7 +34,7 @@ export class MusicalStone extends Entity {
       new OnPointerDown(
         (e) => {
           log('playing sound')
-          sceneMessageBus.emit('noteOn', { note: thisStone.note })
+          sceneMessageBus.emit('playStone', { note: thisStone.note })
         },
         {
           button: ActionButton.POINTER,
@@ -49,7 +50,7 @@ export class MusicalStone extends Entity {
   }
 }
 
-sceneMessageBus.on('noteOn', (e) => {
+sceneMessageBus.on('playStone', (e) => {
   stones[e.note].play()
 
   // ignore if comes from sequencer from other player
