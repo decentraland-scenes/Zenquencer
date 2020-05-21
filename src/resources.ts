@@ -2,7 +2,7 @@ import utils from '../node_modules/decentraland-ecs-utils/index'
 
 export default {
   models: {
-    baseScene: new GLTFShape('models/baseScene.glb'),
+    baseScene: new GLTFShape('models/baseSceneTwoByOne.glb'),
   },
   sounds: {
     kalimbaNotes: {
