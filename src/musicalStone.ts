@@ -21,7 +21,7 @@ export class MusicalStone extends Entity {
   ) {
     super()
     engine.addEntity(this)
-    this.addComponent(shape)
+    //this.addComponent(shape)
     this.addComponent(transform)
 
     // note ID

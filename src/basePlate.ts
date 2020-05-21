@@ -52,6 +52,7 @@ export class BasePlate extends Entity {
       new GLTFShape('models/SpiralStone_01/SpiralStone_01.glb'),
       new Transform({
         position: new Vector3(0, 1, 0),
+        scale: new Vector3(0.6, 0.6, 0.6),
       }),
       this.sound,
       this.index
