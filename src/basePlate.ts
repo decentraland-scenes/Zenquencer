@@ -1,7 +1,7 @@
 //import utils from '../node_modules/decentraland-ecs-utils/index'
 import { MusicalStone, stones } from './musicalStone'
 import resources from './resources'
-import { seqNumbers } from './serverHandler'
+import { seqNumbers, changeSequencer } from './serverHandler'
 
 export const sceneMessageBus = new MessageBus()
 
@@ -72,6 +72,7 @@ sceneMessageBus.on('showStone', (e) => {
   let beat = Math.floor(e.plate / 7)
   log('beat ', beat, ' note ', note)
   seqNumbers[beat][note] = 1
+  changeSequencer()
 })
 
 sceneMessageBus.on('hideStone', (e) => {
@@ -82,4 +83,5 @@ sceneMessageBus.on('hideStone', (e) => {
   let note = e.plate % 7
   let beat = Math.floor(e.plate / 7)
   seqNumbers[beat][note] = 0
+  changeSequencer()
 })

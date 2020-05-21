@@ -13,14 +13,6 @@ engine.addEntity(baseScene)
 let seqOffset = new Vector3(5, 0.2, 4)
 let seqLength = 16
 
-// // Hack to turn off carry if you click the floor (sometimes block isn't quite in the middle of the screen.)
-// floor.addComponent(new OnClick(() => {
-// 	if (Carryable.currentCarry) {
-// 	  Carryable.currentCarry.toggleCarry(new Transform()); // Turning off, so transform doesn't matter.
-// 	}
-//   }))
-//   engine.addEntity(floor);
-
 // Kalimba sounds
 export const kalimbaSounds: AudioClip[] = [
   resources.sounds.kalimbaNotes.f3,
@@ -56,22 +48,25 @@ for (let beat = 0; beat < seqLength; beat++) {
   }
 }
 
-// updateStones()
+updateStones()
 
 async function updateStones() {
   let currentStones = await getStones()
 
   log(currentStones)
-  for (let i = 0; i < currentStones.length; i++) {
-    for (let j = 0; j < currentStones[i].length; j++) {
-      seqNumbers[i][j] = currentStones[i][j]
-      if (currentStones[i][j] == 0) {
-        plates[i * 7 + j].stoneOn = false
-        plates[i * 7 + j].stone.getComponent(GLTFShape).visible = false
+  for (let beat = 0; beat < currentStones.length; beat++) {
+    for (let note = 0; note < currentStones[beat].length; note++) {
+      seqNumbers[beat][note] = currentStones[beat][note]
+      let currentPlate = plates[beat * 7 + note]
+      if (currentStones[beat][note] == 0) {
+        currentPlate.stoneOn = false
+        currentPlate.stone.removeComponent(GLTFShape)
       } else {
-        plates[i * 7 + j].stoneOn = true
-        plates[i * 7 + j].stone.getComponent(GLTFShape).visible = true
+        currentPlate.stoneOn = true
+        currentPlate.stone.addComponentOrReplace(currentPlate.stone.shape)
       }
     }
   }
 }
+
+// play loop if other was playing loop (artichoke?)

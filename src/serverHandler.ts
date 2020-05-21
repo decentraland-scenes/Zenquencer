@@ -10,7 +10,7 @@ export async function getStones(): Promise<number[][]> {
     let url = awsServer + 'sequencer/stones.json'
     let response = await fetch(url).then()
     let json = await response.json()
-    return json.tiles
+    return json.stones
   } catch {
     log('error fetching from AWS server')
   }
@@ -21,7 +21,6 @@ export async function changeSequencer() {
   try {
     let url = fireBaseServer + 'update-sequencer'
     let body = JSON.stringify({ stones: seqNumbers })
-    let headers = {}
     let response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
