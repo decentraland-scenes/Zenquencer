@@ -7,7 +7,12 @@ import { getStones, seqNumbers } from './serverHandler'
 // Base scene
 const baseScene = new Entity()
 baseScene.addComponent(resources.models.baseScene)
-baseScene.addComponent(new Transform({ scale: new Vector3(1, 1, 2) }))
+baseScene.addComponent(
+  new Transform({
+    position: new Vector3(16, 0, 0),
+    rotation: Quaternion.Euler(0, -90, 0)
+  }
+))
 engine.addEntity(baseScene)
 
 let seqOffset = new Vector3(5, 0.2, 4)
