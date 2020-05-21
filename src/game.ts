@@ -22,13 +22,14 @@ let seqLength = 16
 
 // Kalimba sounds
 export const kalimbaSounds: AudioClip[] = [
-  resources.sounds.kalimbaNotes.c3,
-  resources.sounds.kalimbaNotes.a3,
   resources.sounds.kalimbaNotes.f3,
-  resources.sounds.kalimbaNotes.a4,
+  resources.sounds.kalimbaNotes.a3,
+  resources.sounds.kalimbaNotes.c3,
+
   resources.sounds.kalimbaNotes.e4,
   resources.sounds.kalimbaNotes.f4,
   resources.sounds.kalimbaNotes.g4,
+  resources.sounds.kalimbaNotes.a4,
 ]
 
 for (let i = 0; i < seqLength; i++) {
@@ -42,7 +43,7 @@ for (let i = 0; i < seqLength; i++) {
         rotation: Quaternion.Euler(0, 0, 0),
       }),
       kalimbaSounds[j],
-      i
+      i * 7 + j
     )
 
     plates.push(plate)

@@ -1,6 +1,7 @@
 //import utils from '../node_modules/decentraland-ecs-utils/index'
 import { MusicalStone, stones } from './musicalStone'
 import resources from './resources'
+import { seqNumbers } from './serverHandler'
 
 export const sceneMessageBus = new MessageBus()
 
@@ -56,7 +57,7 @@ export class BasePlate extends Entity {
       this.index
     )
     this.stone.setParent(this)
-    this.stone.getComponent(GLTFShape).visible = false
+    this.stone.removeComponent(GLTFShape)
     stones.push(this.stone)
   }
 }
@@ -64,11 +65,20 @@ export class BasePlate extends Entity {
 sceneMessageBus.on('showStone', (e) => {
   plates[e.plate].stoneOn = true
 
-  plates[e.plate].stone.getComponent(GLTFShape).visible = true
+  plates[e.plate].stone.addComponentOrReplace(plates[e.plate].stone.shape)
+
+  let note = e.plate % 7
+  let beat = Math.floor(e.plate / 7)
+  log('beat ', beat, ' note ', note)
+  seqNumbers[beat][note] = 1
 })
 
 sceneMessageBus.on('hideStone', (e) => {
   plates[e.plate].stoneOn = false
 
-  plates[e.plate].stone.getComponent(GLTFShape).visible = false
+  plates[e.plate].stone.removeComponent(GLTFShape)
+
+  let note = e.plate % 7
+  let beat = Math.floor(e.plate / 7)
+  seqNumbers[beat][note] = 0
 })
