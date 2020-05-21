@@ -1,29 +1,22 @@
-import utils from '../node_modules/decentraland-ecs-utils/index'
-import { MusicalStone, stones } from './musicalStone'
+//import utils from '../node_modules/decentraland-ecs-utils/index'
+
 import resources from './resources'
-import { Grid } from './grid'
-import { CarryableSystem } from './carryable'
-import { Sequencer } from './sequencer'
+import { BasePlate, plates } from './basePlate'
+import { getStones, seqNumbers } from './serverHandler'
 
 // Base scene
 const baseScene = new Entity()
 baseScene.addComponent(resources.models.baseScene)
+baseScene.addComponent(
+  new Transform({
+    position: new Vector3(16, 0, 0),
+    rotation: Quaternion.Euler(0, -90, 0)
+  }
+))
 engine.addEntity(baseScene)
 
-const stoneShape = new GLTFShape('models/SpiralStone_01/SpiralStone_01.glb')
-
-let gridOffset = new Vector3(10, 0, 10)
-
-let grid = new Grid(new Vector3(32, 1, 32), gridOffset)
-
-// instance sequencer
-let seqOffset = new Vector3(5, 0, 0)
-let seqSze = new Vector3(4, 1, 16)
-export let seq = new Sequencer(seqOffset, seqSze, grid)
-
-let carryableSystem = new CarryableSystem(grid)
-carryableSystem.setCarryMode(0)
-engine.addSystem(carryableSystem)
+let seqOffset = new Vector3(5, 0.2, 4)
+let seqLength = 16
 
 // // Hack to turn off carry if you click the floor (sometimes block isn't quite in the middle of the screen.)
 // floor.addComponent(new OnClick(() => {
@@ -35,60 +28,55 @@ engine.addSystem(carryableSystem)
 
 // Kalimba sounds
 export const kalimbaSounds: AudioClip[] = [
-  resources.sounds.kalimbaNotes.c3,
-  resources.sounds.kalimbaNotes.a3,
   resources.sounds.kalimbaNotes.f3,
-  resources.sounds.kalimbaNotes.a4,
+  resources.sounds.kalimbaNotes.a3,
+  resources.sounds.kalimbaNotes.c3,
+
   resources.sounds.kalimbaNotes.e4,
   resources.sounds.kalimbaNotes.f4,
   resources.sounds.kalimbaNotes.g4,
+  resources.sounds.kalimbaNotes.a4,
 ]
 
-for (let i = 0; i < kalimbaSounds.length; i++) {
-  const key = new MusicalStone(
-    stoneShape,
-    new Transform({
-      position: new Vector3(2 + i * 2, 0.11, 8),
-      scale: new Vector3(1, 1, 1),
-      rotation: Quaternion.Euler(90, 0, 0),
-    }),
-    kalimbaSounds[i],
-    i
-  )
+for (let beat = 0; beat < seqLength; beat++) {
+  seqNumbers.push([])
+  for (let note = 0; note < kalimbaSounds.length; note++) {
+    const plate = new BasePlate(
+      resources.models.plate,
+      new Transform({
+        position: new Vector3(
+          seqOffset.x + note,
+          seqOffset.y,
+          seqOffset.z + beat
+        ),
+        scale: new Vector3(1, 1, 1),
+        rotation: Quaternion.Euler(0, 0, 0),
+      }),
+      kalimbaSounds[note],
+      beat * 7 + note
+    )
 
-  stones.push(key)
+    plates.push(plate)
+    seqNumbers[beat].push(0)
+  }
 }
 
-const clone1 = new MusicalStone(
-  stoneShape,
-  new Transform({
-    position: new Vector3(4, 0.11, 4),
-    scale: new Vector3(0.5, 0.5, 0.5),
-    rotation: Quaternion.Euler(90, 0, 0),
-  }),
-  kalimbaSounds[1],
-  kalimbaSounds.length,
-  true
-)
-stones.push(clone1)
+// updateStones()
 
-const clone2 = new MusicalStone(
-  stoneShape,
-  new Transform({
-    position: new Vector3(6, 0.11, 4),
-    scale: new Vector3(0.5, 0.5, 0.5),
-    rotation: Quaternion.Euler(90, 0, 0),
-  }),
-  kalimbaSounds[2],
-  kalimbaSounds.length + 1,
-  true
-)
-stones.push(clone2)
+async function updateStones() {
+  let currentStones = await getStones()
 
-// Instance the input object
-const input = Input.instance
-
-//E button event
-input.subscribe('BUTTON_DOWN', ActionButton.PRIMARY, false, (e) => {
-  // drop stone
-})
+  log(currentStones)
+  for (let i = 0; i < currentStones.length; i++) {
+    for (let j = 0; j < currentStones[i].length; j++) {
+      seqNumbers[i][j] = currentStones[i][j]
+      if (currentStones[i][j] == 0) {
+        plates[i * 7 + j].stoneOn = false
+        plates[i * 7 + j].stone.getComponent(GLTFShape).visible = false
+      } else {
+        plates[i * 7 + j].stoneOn = true
+        plates[i * 7 + j].stone.getComponent(GLTFShape).visible = true
+      }
+    }
+  }
+}

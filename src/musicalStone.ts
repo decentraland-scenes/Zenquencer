@@ -1,5 +1,7 @@
-import utils from '../node_modules/decentraland-ecs-utils/index'
-import { Carryable } from './carryable'
+//import utils from '../node_modules/decentraland-ecs-utils/index'
+
+import { seqNumbers } from './serverHandler'
+import { plates } from './basePlate'
 
 export const sceneMessageBus = new MessageBus()
 
@@ -8,117 +10,115 @@ export let stones: MusicalStone[] = []
 // reusable stone class
 export class MusicalStone extends Entity {
   note: number
-  isClone: boolean = false
+  shape: GLTFShape
 
   constructor(
     shape: GLTFShape,
     transform: Transform,
 
     sound: AudioClip,
-    note: number,
-    isClone?: boolean
+    note: number
   ) {
     super()
     engine.addEntity(this)
-    this.addComponent(shape)
+    //this.addComponent(shape)
     this.addComponent(transform)
 
     // note ID
     this.note = note
 
+    this.shape = shape
+
     // Sound
     this.addComponent(new AudioSource(sound))
 
-    if (isClone) {
-      this.isClone = isClone
-      // Make carryable
-      this.addComponent(new Carryable(transform.scale, note))
-    }
-
     let thisStone = this
 
-    if (isClone) {
-      this.addComponent(
-        new OnPointerDown(
-          (e) => {
-            if (e.buttonId == 0) {
-              log('playing sound')
-              sceneMessageBus.emit('noteOn', { note: thisStone.note })
-            } else if (e.buttonId == 1) {
-              log('carrying')
-              let carryable = thisStone.getComponent(Carryable)
-              carryable.toggleCarry(thisStone.getComponent(Transform))
-
-              if (carryable.beingCarried) {
-                thisStone.getComponent(OnPointerDown).hoverText = 'E drop'
-
-                // messagebus: hide from others
-              } else {
-                thisStone.getComponent(OnPointerDown).hoverText =
-                  'Click Play / E Carry'
-
-                // messagebus: position for others
-              }
-            }
-          },
-          {
-            hoverText: 'Click Play / E Carry',
-          }
-        )
+    this.addComponent(
+      new OnPointerDown(
+        (e) => {
+          log('playing sound')
+          sceneMessageBus.emit('playStone', { note: thisStone.note })
+        },
+        {
+          button: ActionButton.POINTER,
+          hoverText: 'Click Play / E Carry',
+        }
       )
-    } else {
-      this.addComponent(
-        new OnPointerDown(
-          (e) => {
-            if (e.buttonId == 0) {
-              log('playing sound')
-              sceneMessageBus.emit('noteOn', { note: thisStone.note })
-            } else if (e.buttonId == 1) {
-              thisStone.clone()
-            }
-          },
-          {
-            hoverText: 'Click Play / E Carry',
-          }
-        )
-      )
-    }
+    )
   }
   public play(): void {
     this.getComponent(AudioSource).playOnce()
 
     // animate
   }
-
-  public clone(): void {
-    const clone = new MusicalStone(
-      this.getComponent(GLTFShape),
-      new Transform({
-        position: this.getComponent(Transform).position.clone(),
-        scale: new Vector3(0.5, 0.5, 0.5),
-        rotation: this.getComponent(Transform).rotation,
-      }),
-      this.getComponent(AudioSource).audioClip,
-      stones.length,
-      true
-    )
-    stones.push(clone)
-
-    let carryable = clone.getComponent(Carryable)
-    carryable.toggleCarry(clone.getComponent(Transform))
-
-    clone.getComponent(OnPointerDown).hoverText = 'E drop'
-
-    // messagebus add to stones array
-  }
 }
 
-sceneMessageBus.on('noteOn', (e) => {
+sceneMessageBus.on('playStone', (e) => {
   stones[e.note].play()
 
   // ignore if comes from sequencer from other player
 })
 
-sceneMessageBus.on('seqOn', (e) => {})
+sceneMessageBus.on('seqOn', (e) => {
+  sequencePlaying = true
+})
 
-sceneMessageBus.on('seqOff', (e) => {})
+sceneMessageBus.on('seqOff', (e) => {
+  sequencePlaying = false
+})
+
+let sequencePlaying: boolean = false
+
+// check server for new messageboard messages
+export class PlaySequence implements ISystem {
+  loopDuration: number
+  intervals: number
+  currentInterval: number
+  currentLoop: number
+  intervalDuration: number
+  //totalMessageTime: number
+  constructor(loopDuration: number, intervals: number) {
+    this.loopDuration = loopDuration
+    this.intervals = intervals
+    this.currentLoop = 0
+    this.currentInterval = 0
+    this.intervalDuration = this.loopDuration / this.intervals
+  }
+  update(dt: number) {
+    if (!sequencePlaying) {
+      return
+    }
+    this.currentLoop += dt
+
+    if (this.currentLoop >= this.currentInterval * this.intervalDuration) {
+      this.currentInterval += 1
+      if (this.currentInterval >= this.intervals) {
+        this.currentLoop = 0
+        this.currentInterval = 0
+        log('new loop')
+      }
+      for (let i = 0; i < 7; i++) {
+        if (seqNumbers[this.currentInterval][i]) {
+          plates[this.currentInterval * 7 + i].stone.play()
+        }
+      }
+    }
+  }
+}
+
+engine.addSystem(new PlaySequence(4, 16))
+
+let toggleSeq = new Entity()
+toggleSeq.addComponent(new Transform({ position: new Vector3(2, 1, 2) }))
+toggleSeq.addComponent(new BoxShape())
+engine.addEntity(toggleSeq)
+toggleSeq.addComponent(
+  new OnPointerDown(() => {
+    if (sequencePlaying) {
+      sceneMessageBus.emit('seqOff', {})
+    } else {
+      sceneMessageBus.emit('seqOn', {})
+    }
+  })
+)
