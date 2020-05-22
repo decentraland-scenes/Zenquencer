@@ -38,19 +38,6 @@ export class MusicalDrop extends Entity {
 
     // needed to reference the entity from inside a component, because `this` in there refers to the component
     let thisStone = this
-
-    // this.addComponent(
-    //   new OnPointerDown(
-    //     (e) => {
-    //       log('playing sound')
-    //       sceneMessageBus.emit('playStone', { note: thisStone.note })
-    //     },
-    //     {
-    //       button: ActionButton.POINTER,
-    //       hoverText: 'Play',
-    //     }
-    //   )
-    // )
   }
   public play(): void {
     this.getComponent(AudioSource).playOnce()
@@ -123,11 +110,50 @@ toggleSeq.addComponent(new Transform({ position: new Vector3(2, 1, 2) }))
 toggleSeq.addComponent(new BoxShape())
 engine.addEntity(toggleSeq)
 toggleSeq.addComponent(
-  new OnPointerDown(() => {
-    if (sequencePlaying) {
-      sceneMessageBus.emit('seqOff', {})
-    } else {
-      sceneMessageBus.emit('seqOn', {})
-    }
-  })
+  new OnPointerDown(
+    () => {
+      if (sequencePlaying) {
+        sceneMessageBus.emit('seqOff', {})
+      } else {
+        sceneMessageBus.emit('seqOn', {})
+      }
+    },
+    { hoverText: 'Start loop' }
+  )
+)
+
+let fast = new Entity()
+fast.addComponent(new Transform({ position: new Vector3(2, 1, 4) }))
+fast.addComponent(new BoxShape())
+engine.addEntity(fast)
+fast.addComponent(
+  new OnPointerDown(
+    () => {
+      if (sequencePlaying) {
+        let newDuration = Math.max(loopPlayer.loopDuration / 2, 2)
+        log('new duration = ', newDuration)
+        loopPlayer.loopDuration = newDuration
+        loopPlayer.beatDuration = loopPlayer.loopDuration / loopPlayer.beats
+      }
+    },
+    { hoverText: 'Faster' }
+  )
+)
+
+let slow = new Entity()
+slow.addComponent(new Transform({ position: new Vector3(2, 1, 6) }))
+slow.addComponent(new BoxShape())
+engine.addEntity(slow)
+slow.addComponent(
+  new OnPointerDown(
+    () => {
+      if (slow) {
+        let newDuration = Math.min(loopPlayer.loopDuration * 2, 16)
+        log('new duration = ', newDuration)
+        loopPlayer.loopDuration = newDuration
+        loopPlayer.beatDuration = loopPlayer.loopDuration / loopPlayer.beats
+      }
+    },
+    { hoverText: 'Slower' }
+  )
 )
