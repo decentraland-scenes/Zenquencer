@@ -4,6 +4,8 @@ import resources from './resources'
 
 export const sceneMessageBus = new MessageBus()
 
+const loopDuration = 60
+
 export let drops: MusicalDrop[] = []
 
 // reusable stone class
@@ -57,15 +59,21 @@ sceneMessageBus.on('playStone', (e) => {
 sceneMessageBus.on('seqOn', (e) => {
   loopPlayer.playingMode = 1
   loopPlayer.currentBeat = -1
+  loopPlayer.durationLeft = loopDuration
   linear.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
   random.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+  energyAnimation.stop()
+  energyAnimation.play()
 })
 
 sceneMessageBus.on('randomMode', (e) => {
   loopPlayer.playingMode = 2
   loopPlayer.currentBeat = -1
+  loopPlayer.durationLeft = loopDuration
   random.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
   linear.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+  energyAnimation.stop()
+  energyAnimation.play()
 })
 
 sceneMessageBus.on('seqOff', (e) => {
@@ -79,12 +87,12 @@ export class PlaySequence implements ISystem {
   playingMode: number // 0 = off, 1 = loop, 2 = random
   currentBeat: number
   loopDuration: number
-  loopsLeft: number
+  durationLeft: number
   beats: number
   currentLoop: number
   beatDuration: number
-  constructor(loopDuration: number, loops: number, beats: number) {
-    this.loopsLeft = loops
+  constructor(loopDuration: number, totalDuration: number, beats: number) {
+    this.durationLeft = totalDuration
     this.loopDuration = loopDuration
     this.beats = beats
     this.currentLoop = 0
@@ -95,19 +103,21 @@ export class PlaySequence implements ISystem {
     if (!this.playingMode) {
       return
     }
-    this.currentLoop += dt
 
+    this.durationLeft -= dt
+    if (this.durationLeft < 0) {
+      this.playingMode = 0
+      energyAnimation.stop()
+      linear.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+      random.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+    }
+    this.currentLoop += dt
     if (this.currentLoop >= this.currentBeat * this.beatDuration) {
       this.currentBeat += 1
       if (this.currentBeat >= this.beats) {
         this.currentLoop = 0
         this.currentBeat = 0
-        this.loopsLeft -= 1
-        if (this.loopsLeft < 0) {
-          this.playingMode = 0
-          linear.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
-          random.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
-        }
+
         log('new loop')
       }
       if (this.playingMode == 1) {
@@ -130,8 +140,8 @@ export class PlaySequence implements ISystem {
   }
 }
 
-// start loop, lasting 4 seconds and with 16 beats
-export let loopPlayer = new PlaySequence(4, 16, 16)
+// start loop, w 8 second loops and with 16 beats
+export let loopPlayer = new PlaySequence(8, loopDuration, 16)
 engine.addSystem(loopPlayer)
 
 ///// Buttons
@@ -142,6 +152,8 @@ tube.addComponent(
     rotation: Quaternion.Euler(0, 270, 0),
   })
 )
+let energyAnimation = new AnimationState('Energy_Action', { looping: false })
+tube.addComponent(new Animator()).addClip(energyAnimation)
 tube.addComponent(resources.models.tube)
 engine.addEntity(tube)
 
@@ -191,7 +203,7 @@ fast.addComponent(
   new OnPointerDown(
     () => {
       if (loopPlayer.playingMode) {
-        let newDuration = Math.max(loopPlayer.loopDuration / 2, 2)
+        let newDuration = Math.max(loopPlayer.loopDuration / 2, 4)
         log('new duration = ', newDuration)
         loopPlayer.loopDuration = newDuration
         loopPlayer.beatDuration = loopPlayer.loopDuration / loopPlayer.beats
@@ -209,7 +221,7 @@ slow.addComponent(
   new OnPointerDown(
     () => {
       if (loopPlayer.playingMode) {
-        let newDuration = Math.min(loopPlayer.loopDuration * 2, 16)
+        let newDuration = Math.min(loopPlayer.loopDuration * 2, 32)
         log('new duration = ', newDuration)
         loopPlayer.loopDuration = newDuration
         loopPlayer.beatDuration = loopPlayer.loopDuration / loopPlayer.beats
