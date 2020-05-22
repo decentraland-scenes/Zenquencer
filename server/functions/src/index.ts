@@ -16,15 +16,19 @@ app.get('/hello-world', (req: any, res: any) => {
 
 app.post('/update-sequencer', async (req: any, res: any) => {
   let stones = req.body.stones
+  let realm = req.query.realm
 
-  updateSeqJSON(stones)
+  updateSeqJSON(stones, realm)
 
   return res.status(200).send('Updated Sequencer')
 })
 
 app.get('/sequencer', async (req: any, res: any) => {
+  let realm = req.query.realm
   let url =
-    'https://genesis-plaza.s3.us-east-2.amazonaws.com/sequencer/stones.json'
+    'https://genesis-plaza.s3.us-east-2.amazonaws.com/sequencer/' +
+    realm +
+    '/stones.json'
 
   let currentSeq: number[][] = await getSeqJSON(url)
 
@@ -44,11 +48,11 @@ AWS.config.update({
   region: 'us-east-2',
 })
 
-export async function updateSeqJSON(stones: number[][]) {
+export async function updateSeqJSON(stones: number[][], realm: string) {
   var upload = new AWS.S3.ManagedUpload({
     params: {
       Bucket: 'genesis-plaza',
-      Key: 'sequencer/stones.json',
+      Key: 'sequencer/' + realm + '/stones.json',
       Body: JSON.stringify({ stones: stones }),
       ACL: 'public-read',
       ContentType: 'application/json; charset=utf-8',

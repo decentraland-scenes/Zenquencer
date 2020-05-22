@@ -3,13 +3,6 @@
 import resources from './resources'
 import { Stone, stones } from './stones'
 import { getStones, seqNumbers } from './serverHandler'
-import { getCurrentRealm } from '@decentraland/EnvironmentAPI'
-
-const playerRealm = executeTask(async () => {
-  let realm = await getCurrentRealm()
-  log(`You are in the realm: ${JSON.stringify(realm.displayName)}`)
-  return realm
-})
 
 // Base scene
 const base = new Entity()

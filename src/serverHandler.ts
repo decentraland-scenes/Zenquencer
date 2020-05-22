@@ -1,3 +1,11 @@
+import { getCurrentRealm } from '@decentraland/EnvironmentAPI'
+
+const playerRealm = executeTask(async () => {
+  let realm = await getCurrentRealm()
+  log(`You are in the realm: ${JSON.stringify(realm.displayName)}`)
+  return realm
+})
+
 export let seqNumbers: number[][] = []
 
 export let awsServer = 'https://genesis-plaza.s3.us-east-2.amazonaws.com/'
@@ -7,7 +15,7 @@ export let fireBaseServer =
 // get lastest mural state
 export async function getStones(): Promise<number[][]> {
   try {
-    let url = awsServer + 'sequencer/stones.json'
+    let url = awsServer + 'sequencer/' + playerRealm.displayName + 'stones.json'
     let response = await fetch(url).then()
     let json = await response.json()
     return json.stones
@@ -19,7 +27,8 @@ export async function getStones(): Promise<number[][]> {
 // update mural
 export async function changeSequencer() {
   try {
-    let url = fireBaseServer + 'update-sequencer'
+    let url =
+      fireBaseServer + 'update-sequencer?realm=' + playerRealm.displayName
     let body = JSON.stringify({ stones: seqNumbers })
     let response = await fetch(url, {
       method: 'POST',
