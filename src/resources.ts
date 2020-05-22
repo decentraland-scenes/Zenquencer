@@ -1,7 +1,11 @@
 export default {
   models: {
+    base: new GLTFShape('models/baseSceneTwoByOne.glb'),
     pool: new GLTFShape('models/pool.glb'),
     stone: new GLTFShape('models/stone.glb'),
+    linearButton: new GLTFShape('models/linear.glb'),
+    randomButton: new GLTFShape('models/random.glb'),
+    tube: new GLTFShape('models/tube.glb'),
   },
   sounds: {
     kalimbaNotes: {

@@ -1,4 +1,4 @@
-import { MusicalDrop, drops, sequencePlaying } from './musicalDrops'
+import { MusicalDrop, drops, loopPlayer } from './musicalDrops'
 import { seqNumbers, changeSequencer } from './serverHandler'
 
 export const sceneMessageBus = new MessageBus()
@@ -66,7 +66,7 @@ sceneMessageBus.on('showStone', (e) => {
 
   stones[e.stone].drop.addComponentOrReplace(stones[e.stone].drop.shape)
 
-  if (!sequencePlaying) {
+  if (!loopPlayer.playingMode) {
     stones[e.stone].drop.play()
   }
 

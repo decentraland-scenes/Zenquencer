@@ -5,6 +5,16 @@ import { Stone, stones } from './stones'
 import { getStones, seqNumbers } from './serverHandler'
 
 // Base scene
+const base = new Entity()
+base.addComponent(resources.models.base)
+base.addComponent(
+  new Transform({
+    position: new Vector3(0, 0, 32),
+    rotation: Quaternion.Euler(0, 90, 0),
+  })
+)
+engine.addEntity(base)
+
 const pool = new Entity()
 pool.addComponent(resources.models.pool)
 pool.addComponent(
