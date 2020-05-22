@@ -1,21 +1,21 @@
 //import utils from '../node_modules/decentraland-ecs-utils/index'
 
 import resources from './resources'
-import { BasePlate, plates } from './basePlate'
+import { Stone, stones } from './stones'
 import { getStones, seqNumbers } from './serverHandler'
 
 // Base scene
-const baseScene = new Entity()
-baseScene.addComponent(resources.models.baseScene)
-baseScene.addComponent(
+const pool = new Entity()
+pool.addComponent(resources.models.pool)
+pool.addComponent(
   new Transform({
-    position: new Vector3(16, 0, 0),
-    rotation: Quaternion.Euler(0, -90, 0)
-  }
-))
-engine.addEntity(baseScene)
+    position: new Vector3(8, 0, 11.5),
+    rotation: Quaternion.Euler(0, 90, 0),
+  })
+)
+engine.addEntity(pool)
 
-let seqOffset = new Vector3(5, 0.2, 4)
+let seqOffset = new Vector3(5, 0.3, 4)
 let seqLength = 16
 
 // Kalimba sounds
@@ -23,7 +23,6 @@ export const kalimbaSounds: AudioClip[] = [
   resources.sounds.kalimbaNotes.f3,
   resources.sounds.kalimbaNotes.a3,
   resources.sounds.kalimbaNotes.c3,
-
   resources.sounds.kalimbaNotes.e4,
   resources.sounds.kalimbaNotes.f4,
   resources.sounds.kalimbaNotes.g4,
@@ -33,8 +32,8 @@ export const kalimbaSounds: AudioClip[] = [
 for (let beat = 0; beat < seqLength; beat++) {
   seqNumbers.push([])
   for (let note = 0; note < kalimbaSounds.length; note++) {
-    const plate = new BasePlate(
-      resources.models.plate,
+    const currentStone = new Stone(
+      resources.models.stone,
       new Transform({
         position: new Vector3(
           seqOffset.x + note,
@@ -42,13 +41,13 @@ for (let beat = 0; beat < seqLength; beat++) {
           seqOffset.z + beat
         ),
         scale: new Vector3(1, 1, 1),
-        rotation: Quaternion.Euler(0, 0, 0),
+        rotation: Quaternion.Euler(180, 0, 0),
       }),
       kalimbaSounds[note],
       beat * 7 + note
     )
 
-    plates.push(plate)
+    stones.push(currentStone)
     seqNumbers[beat].push(0)
   }
 }
@@ -62,13 +61,19 @@ async function updateStones() {
   for (let beat = 0; beat < currentStones.length; beat++) {
     for (let note = 0; note < currentStones[beat].length; note++) {
       seqNumbers[beat][note] = currentStones[beat][note]
-      let currentPlate = plates[beat * 7 + note]
+      let currentStone = stones[beat * 7 + note]
       if (currentStones[beat][note] == 0) {
-        currentPlate.stoneOn = false
-        currentPlate.stone.removeComponent(GLTFShape)
+        currentStone.stoneOn = false
+
+        currentStone.drop.removeComponent(GLTFShape)
       } else {
-        currentPlate.stoneOn = true
-        currentPlate.stone.addComponentOrReplace(currentPlate.stone.shape)
+        currentStone.stoneOn = true
+        currentStone.getComponent(Transform).rotation = Quaternion.Euler(
+          0,
+          0,
+          0
+        )
+        currentStone.drop.addComponentOrReplace(currentStone.drop.shape)
       }
     }
   }
