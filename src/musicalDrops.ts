@@ -203,10 +203,12 @@ fast.addComponent(
   new OnPointerDown(
     () => {
       if (loopPlayer.playingMode) {
-        let newDuration = Math.max(loopPlayer.loopDuration / 2, 4)
+        let newDuration = loopPlayer.loopDuration / 2
+        if (newDuration < 4) return
         log('new duration = ', newDuration)
         loopPlayer.loopDuration = newDuration
         loopPlayer.beatDuration = loopPlayer.loopDuration / loopPlayer.beats
+        loopPlayer.currentLoop /= 2
       }
     },
     { hoverText: 'Faster' }
@@ -221,10 +223,12 @@ slow.addComponent(
   new OnPointerDown(
     () => {
       if (loopPlayer.playingMode) {
-        let newDuration = Math.min(loopPlayer.loopDuration * 2, 32)
+        let newDuration = loopPlayer.loopDuration * 2
+        if (newDuration > 32) return
         log('new duration = ', newDuration)
         loopPlayer.loopDuration = newDuration
         loopPlayer.beatDuration = loopPlayer.loopDuration / loopPlayer.beats
+        loopPlayer.currentLoop *= 2
       }
     },
     { hoverText: 'Slower' }
