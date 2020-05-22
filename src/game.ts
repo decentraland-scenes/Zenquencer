@@ -1,8 +1,8 @@
 //import utils from '../node_modules/decentraland-ecs-utils/index'
 
 import resources from './resources'
-import { Stone, stones } from './stones'
-import { getStones, seqNumbers } from './serverHandler'
+import { Stone, stones, seqNumbers } from './stones'
+import { getStones } from './serverHandler'
 
 // Base scene
 const base = new Entity()
@@ -62,10 +62,12 @@ for (let beat = 0; beat < seqLength; beat++) {
   }
 }
 
+//setRealm().then()
 updateStones()
 
 async function updateStones() {
   let currentStones = await getStones()
+  if (!currentStones) return
 
   log(currentStones)
   for (let beat = 0; beat < currentStones.length; beat++) {

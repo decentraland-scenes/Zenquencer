@@ -1,22 +1,22 @@
-import { getCurrentRealm } from '@decentraland/EnvironmentAPI'
+import { seqNumbers } from './stones'
+import { getRealm } from './realmData'
 
-const playerRealm = executeTask(async () => {
-  let realm = await getCurrentRealm()
-  log(`You are in the realm: ${JSON.stringify(realm.displayName)}`)
-  return realm
-})
+export let playerRealm = 'localhost-stub' //getRealm()
 
-export let seqNumbers: number[][] = []
-
+// external servers being used by the project - Please change these to your own if working on something else!
 export let awsServer = 'https://genesis-plaza.s3.us-east-2.amazonaws.com/'
 export let fireBaseServer =
   'https://us-central1-genesis-plaza.cloudfunctions.net/app/'
 
-// get lastest mural state
+// get latest sequencer state stored in server
 export async function getStones(): Promise<number[][]> {
   try {
-    let url = awsServer + 'sequencer/' + playerRealm.displayName + 'stones.json'
-    let response = await fetch(url).then()
+    // if (!playerRealm) {
+    //   await setRealm()
+    // }
+    let url = awsServer + 'sequencer/' + playerRealm + '/stones.json'
+    log('url used ', url)
+    let response = await fetch(url)
     let json = await response.json()
     return json.stones
   } catch {
@@ -24,11 +24,13 @@ export async function getStones(): Promise<number[][]> {
   }
 }
 
-// update mural
+// change data in sequencer
 export async function changeSequencer() {
   try {
-    let url =
-      fireBaseServer + 'update-sequencer?realm=' + playerRealm.displayName
+    // if (!playerRealm) {
+    //   await setRealm()
+    // }
+    let url = fireBaseServer + 'update-sequencer?realm=' + playerRealm
     let body = JSON.stringify({ stones: seqNumbers })
     let response = await fetch(url, {
       method: 'POST',

@@ -1,4 +1,4 @@
-import { seqNumbers } from './serverHandler'
+import { seqNumbers } from './stones'
 import { stones } from './stones'
 import resources from './resources'
 

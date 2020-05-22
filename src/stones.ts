@@ -1,9 +1,12 @@
 import { MusicalDrop, drops, loopPlayer } from './musicalDrops'
-import { seqNumbers, changeSequencer } from './serverHandler'
+import { changeSequencer } from './serverHandler'
 
 export const sceneMessageBus = new MessageBus()
 
 export let stones: Stone[] = []
+
+// lightweight storage of sequencer state
+export let seqNumbers: number[][] = []
 
 // reusable stone class
 export class Stone extends Entity {
