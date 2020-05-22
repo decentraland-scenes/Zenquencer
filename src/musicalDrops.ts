@@ -163,7 +163,7 @@ engine.addEntity(tube)
 let linear = new Entity()
 linear.addComponent(
   new Transform({
-    position: new Vector3(-9.54, 1.5, 4.6),
+    position: new Vector3(-9.54, 1.48, 4.59),
     rotation: Quaternion.Euler(0, 180, 0),
   })
 )
@@ -182,7 +182,7 @@ linear.addComponent(
 let random = new Entity()
 random.addComponent(
   new Transform({
-    position: new Vector3(-9.54, 1.5, 4.3),
+    position: new Vector3(-9.54, 1.49, 4.33),
     rotation: Quaternion.Euler(0, 180, 0),
   })
 )
@@ -201,7 +201,7 @@ random.addComponent(
 let slow2 = new Entity()
 slow2.addComponent(
   new Transform({
-    position: new Vector3(-9.54, 1.6, 4.55),
+    position: new Vector3(-9.54, 1.6, 4.59),
     rotation: Quaternion.Euler(0, 180, 0),
   })
 )
@@ -220,7 +220,7 @@ slow2.addComponent(
 let slow1 = new Entity()
 slow1.addComponent(
   new Transform({
-    position: new Vector3(-9.54, 1.6, 4.5),
+    position: new Vector3(-9.54, 1.6, 4.53),
     rotation: Quaternion.Euler(0, 180, 0),
   })
 )
@@ -239,7 +239,7 @@ slow1.addComponent(
 let neutral = new Entity()
 neutral.addComponent(
   new Transform({
-    position: new Vector3(-9.54, 1.6, 4.45),
+    position: new Vector3(-9.54, 1.6, 4.47),
     rotation: Quaternion.Euler(0, 180, 0),
   })
 )
@@ -258,7 +258,7 @@ neutral.addComponent(
 let fast1 = new Entity()
 fast1.addComponent(
   new Transform({
-    position: new Vector3(-9.54, 1.6, 4.4),
+    position: new Vector3(-9.54, 1.6, 4.41),
     rotation: Quaternion.Euler(0, 180, 0),
   })
 )
