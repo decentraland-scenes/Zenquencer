@@ -62,6 +62,7 @@ sceneMessageBus.on('seqOn', (e) => {
   loopPlayer.durationLeft = loopDuration
   linear.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
   random.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+  neutral.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
   energyAnimation.stop()
   energyAnimation.play()
 })
@@ -72,6 +73,7 @@ sceneMessageBus.on('randomMode', (e) => {
   loopPlayer.durationLeft = loopDuration
   random.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
   linear.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+  neutral.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
   energyAnimation.stop()
   energyAnimation.play()
 })
@@ -80,6 +82,7 @@ sceneMessageBus.on('seqOff', (e) => {
   loopPlayer.playingMode = 0
   linear.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
   random.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+  neutral.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
 })
 
 // system to play the loop continuously
@@ -195,42 +198,148 @@ random.addComponent(
   )
 )
 
-let fast = new Entity()
-fast.addComponent(new Transform({ position: new Vector3(2, 1, 6) }))
-fast.addComponent(new BoxShape())
-engine.addEntity(fast)
-fast.addComponent(
+let slow2 = new Entity()
+slow2.addComponent(
+  new Transform({
+    position: new Vector3(-9.54, 1.6, 4.55),
+    rotation: Quaternion.Euler(0, 180, 0),
+  })
+)
+slow2.addComponent(resources.models.speedButton)
+slow2.setParent(tube)
+engine.addEntity(slow2)
+slow2.addComponent(
   new OnPointerDown(
     () => {
-      if (loopPlayer.playingMode) {
-        let newDuration = loopPlayer.loopDuration / 2
-        if (newDuration < 4) return
-        log('new duration = ', newDuration)
-        loopPlayer.loopDuration = newDuration
-        loopPlayer.beatDuration = loopPlayer.loopDuration / loopPlayer.beats
-        loopPlayer.currentLoop /= 2
-      }
+      sceneMessageBus.emit('seqSpeed', { speed: 12 })
     },
-    { hoverText: 'Faster' }
+    { hoverText: 'Very Slow' }
   )
 )
 
-let slow = new Entity()
-slow.addComponent(new Transform({ position: new Vector3(2, 1, 8) }))
-slow.addComponent(new BoxShape())
-engine.addEntity(slow)
-slow.addComponent(
+let slow1 = new Entity()
+slow1.addComponent(
+  new Transform({
+    position: new Vector3(-9.54, 1.6, 4.5),
+    rotation: Quaternion.Euler(0, 180, 0),
+  })
+)
+slow1.addComponent(resources.models.speedButton)
+slow1.setParent(tube)
+engine.addEntity(slow1)
+slow1.addComponent(
   new OnPointerDown(
     () => {
-      if (loopPlayer.playingMode) {
-        let newDuration = loopPlayer.loopDuration * 2
-        if (newDuration > 32) return
-        log('new duration = ', newDuration)
-        loopPlayer.loopDuration = newDuration
-        loopPlayer.beatDuration = loopPlayer.loopDuration / loopPlayer.beats
-        loopPlayer.currentLoop *= 2
-      }
+      sceneMessageBus.emit('seqSpeed', { speed: 8 })
     },
-    { hoverText: 'Slower' }
+    { hoverText: 'Slow' }
   )
 )
+
+let neutral = new Entity()
+neutral.addComponent(
+  new Transform({
+    position: new Vector3(-9.54, 1.6, 4.45),
+    rotation: Quaternion.Euler(0, 180, 0),
+  })
+)
+neutral.addComponent(resources.models.speedButton)
+neutral.setParent(tube)
+engine.addEntity(neutral)
+neutral.addComponent(
+  new OnPointerDown(
+    () => {
+      sceneMessageBus.emit('seqSpeed', { speed: 4 })
+    },
+    { hoverText: 'Normal' }
+  )
+)
+
+let fast1 = new Entity()
+fast1.addComponent(
+  new Transform({
+    position: new Vector3(-9.54, 1.6, 4.4),
+    rotation: Quaternion.Euler(0, 180, 0),
+  })
+)
+fast1.addComponent(resources.models.speedButton)
+fast1.setParent(tube)
+engine.addEntity(fast1)
+fast1.addComponent(
+  new OnPointerDown(
+    () => {
+      sceneMessageBus.emit('seqSpeed', { speed: 2 })
+    },
+    { hoverText: 'Fast' }
+  )
+)
+
+let fast2 = new Entity()
+fast2.addComponent(
+  new Transform({
+    position: new Vector3(-9.54, 1.6, 4.35),
+    rotation: Quaternion.Euler(0, 180, 0),
+  })
+)
+fast2.addComponent(resources.models.speedButton)
+fast2.setParent(tube)
+engine.addEntity(fast2)
+fast2.addComponent(
+  new OnPointerDown(
+    () => {
+      sceneMessageBus.emit('seqSpeed', { speed: 1 })
+    },
+    { hoverText: 'Very Fast' }
+  )
+)
+
+sceneMessageBus.on('seqSpeed', (e) => {
+  if (loopPlayer.playingMode) {
+    let newSpeed = e.speed * 4
+
+    log('new duration = ', newSpeed)
+    loopPlayer.loopDuration = newSpeed
+    loopPlayer.beatDuration = loopPlayer.loopDuration / loopPlayer.beats
+    loopPlayer.currentLoop = loopPlayer.currentBeat * loopPlayer.beatDuration
+
+    switch (e.speed) {
+      case 12:
+        slow2.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
+        slow1.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
+        neutral.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
+        fast1.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+        fast2.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+        break
+      case 8:
+        slow2.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+        slow1.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
+        neutral.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
+        fast1.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+        fast2.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+        break
+      case 4:
+        slow2.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+        slow1.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+        neutral.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
+        fast1.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+        fast2.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+        break
+      case 2:
+        slow2.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+        slow1.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+        neutral.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
+        fast1.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
+        fast2.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+        break
+      case 1:
+        slow2.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+        slow1.getComponent(Transform).rotation = Quaternion.Euler(0, 180, 0)
+        neutral.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
+        fast1.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
+        fast2.getComponent(Transform).rotation = Quaternion.Euler(0, 0, 0)
+        break
+    }
+  } else {
+    sceneMessageBus.emit('seqOn', {})
+  }
+})

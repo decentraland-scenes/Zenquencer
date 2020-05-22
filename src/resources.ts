@@ -5,6 +5,8 @@ export default {
     stone: new GLTFShape('models/stone.glb'),
     linearButton: new GLTFShape('models/linear.glb'),
     randomButton: new GLTFShape('models/random.glb'),
+    speedButton: new GLTFShape('models/speedButton.glb'),
+
     tube: new GLTFShape('models/tube.glb'),
   },
   sounds: {
