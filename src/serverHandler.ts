@@ -1,7 +1,6 @@
 import { seqNumbers } from './stones'
-import { getRealm } from './realmData'
-
-export let playerRealm = 'localhost-stub' //getRealm()
+import { getRealm, playerRealm } from './realmData'
+import utils from '../node_modules/decentraland-ecs-utils/index'
 
 // external servers being used by the project - Please change these to your own if working on something else!
 export let awsServer = 'https://genesis-plaza.s3.us-east-2.amazonaws.com/'
@@ -12,7 +11,7 @@ export let fireBaseServer =
 export async function getStones(): Promise<number[][]> {
   try {
     // if (!playerRealm) {
-    //   await setRealm()
+    //   playerRealm = await getRealm()
     // }
     let url = awsServer + 'sequencer/' + playerRealm + '/stones.json'
     log('url used ', url)
@@ -26,19 +25,28 @@ export async function getStones(): Promise<number[][]> {
 
 // change data in sequencer
 export async function changeSequencer() {
-  try {
-    // if (!playerRealm) {
-    //   await setRealm()
-    // }
-    let url = fireBaseServer + 'update-sequencer?realm=' + playerRealm
-    let body = JSON.stringify({ stones: seqNumbers })
-    let response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: body,
+  // if (!playerRealm) {
+  //   await setRealm()
+  // }
+  seqChanger.addComponentOrReplace(
+    // Only send request if no more changes come over the next second
+    new utils.Delay(1000, async function () {
+      try {
+        let url = fireBaseServer + 'update-sequencer?realm=' + playerRealm
+        let body = JSON.stringify({ stones: seqNumbers })
+        let response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: body,
+        })
+        return response.json()
+      } catch {
+        log('error fetching from AWS server')
+      }
     })
-    return response.json()
-  } catch {
-    log('error fetching from AWS server')
-  }
+  )
 }
+
+// dummy entity to throttle the sending of change requests
+let seqChanger = new Entity()
+engine.addEntity(seqChanger)
