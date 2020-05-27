@@ -1,5 +1,6 @@
-import { MusicalDrop, drops, loopPlayer } from './musicalDrops'
+import { MusicalDrop } from './musicalDrops'
 import { changeSequencer } from './serverHandler'
+import { drops, loopPlayer } from './game'
 
 export const sceneMessageBus = new MessageBus()
 

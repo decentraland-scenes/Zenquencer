@@ -1,12 +1,7 @@
 import { seqNumbers } from './stones'
 import { stones } from './stones'
 import resources from './resources'
-
-export const sceneMessageBus = new MessageBus()
-
-const loopDuration = 60
-
-export let drops: MusicalDrop[] = []
+import { sceneMessageBus, drops, loopPlayer, loopDuration } from './game'
 
 // reusable stone class
 export class MusicalDrop extends Entity {
@@ -142,10 +137,6 @@ export class PlaySequence implements ISystem {
     }
   }
 }
-
-// start loop, w 8 second loops and with 16 beats
-export let loopPlayer = new PlaySequence(8, loopDuration, 16)
-engine.addSystem(loopPlayer)
 
 ///// Buttons
 let tube = new Entity()

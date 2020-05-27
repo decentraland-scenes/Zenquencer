@@ -1,6 +1,23 @@
 import { seqNumbers } from './stones'
-import { getRealm, playerRealm } from './realmData'
 import utils from '../node_modules/decentraland-ecs-utils/index'
+import { getCurrentRealm } from '@decentraland/EnvironmentAPI'
+
+// we're hardcoding the player's realm, bc it can't be fetched while the scene is being loaded. Needs to be triggered after that.
+export let playerRealm = 'localhost-stub' //getRealm()
+
+// fetch the player's realm
+export async function setRealm() {
+  let realm = await getCurrentRealm()
+  log(`You are in the realm: ${JSON.stringify(realm.displayName)}`)
+  playerRealm = realm.displayName
+}
+
+// fetch the player's realm
+export async function getRealm() {
+  let realm = await getCurrentRealm()
+  log(`You are in the realm: ${JSON.stringify(realm.displayName)}`)
+  return realm.displayName
+}
 
 // external servers being used by the project - Please change these to your own if working on something else!
 export let awsServer = 'https://genesis-plaza.s3.us-east-2.amazonaws.com/'

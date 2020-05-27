@@ -3,6 +3,13 @@
 import resources from './resources'
 import { Stone, stones, seqNumbers } from './stones'
 import { getStones } from './serverHandler'
+import { PlaySequence, MusicalDrop } from './musicalDrops'
+
+export const sceneMessageBus = new MessageBus()
+
+export const loopDuration = 60
+
+export let drops: MusicalDrop[] = []
 
 // Base scene
 const base = new Entity()
@@ -91,4 +98,6 @@ async function updateStones() {
   }
 }
 
-// play loop if other was playing loop (artichoke?)
+// start loop, w 8 second loops and with 16 beats
+export let loopPlayer = new PlaySequence(8, loopDuration, 16)
+engine.addSystem(loopPlayer)
