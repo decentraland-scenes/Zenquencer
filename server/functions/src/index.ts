@@ -1,9 +1,9 @@
 //const admin = require('firebase-admin')
+const functions = require('firebase-functions')
 const express = require('express')
 const cors = require('cors')
 const app = express()
 app.use(cors({ origin: true }))
-require('isomorphic-fetch')
 
 export type messageBoard = {
   name: string
@@ -82,3 +82,5 @@ export async function getSeqJSON(url: string): Promise<any> {
     return []
   }
 }
+
+exports.app = functions.https.onRequest(app)
