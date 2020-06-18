@@ -1,7 +1,10 @@
-import { seqNumbers } from './stones'
+import { seqNumbers, sceneMessageBus } from './stones'
 import { stones } from './stones'
 import resources from './resources'
-import { sceneMessageBus, drops, loopPlayer, loopDuration } from './game'
+
+export let drops: MusicalDrop[] = []
+
+export const loopDuration = 60
 
 // reusable stone class
 export class MusicalDrop extends Entity {
@@ -334,3 +337,7 @@ sceneMessageBus.on('seqSpeed', (e) => {
     sceneMessageBus.emit('seqOn', {})
   }
 })
+
+// start loop, w 8 second loops and with 16 beats
+export let loopPlayer = new PlaySequence(8, loopDuration, 16)
+engine.addSystem(loopPlayer)
