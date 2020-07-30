@@ -17,3 +17,8 @@ In this example you can play with a sequencer to write out some musical patterns
 For this to work properly, we need to keep a separate version of this pattern for each realm and know what realm each player is on when they update the pattern. This is because only players that are in the same realm message each other via the Message Bus. There would otherwise be odd inconsistencies in what the pattern ends up being when players that are in different realms modify the same pattern without notifying each other. The scene includes the player’s realm as part of the requests it sends, and the server then handles a different .json file depending on the realm.
 
 Another noteworthy thing we’re doing in this example is that changes aren’t sent to the server right away, but instead we do a little buffer using the utils.Delay component, so that if the player changes several notes in quick succession, the server only gets notified of the final state of the pattern. This helps reduce the number of requests that the server needs to handle. For it to work, each update request needs to send the full state of the pattern, rather than just the changed elements.
+
+
+
+
+If something doesn’t work, please [file an issue](https://github.com/decentraland-scenes/Awesome-Repository/issues/new).
