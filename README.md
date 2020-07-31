@@ -52,5 +52,7 @@ Any dependencies are installed and then the CLI opens the scene in a new browser
 
 The scene is set up to make use of the same server that's used by Genesis Plaza. To launch your own server, we recommend you deploy what's in the `/server` folder to your own Firebase account, following the steps in [this tutorial](https://decentraland.org/blog/tutorials/servers-part-2/). To store data on an Amazon S3 server, as done here, you'll also need to set up your own Amazon S3, and fetch credentials for that account to include in your server folder.
 
+Learn more about how to build your own scenes in our [documentation](https://docs.decentraland.org/) site.
+
 
 If something doesn’t work, please [file an issue](https://github.com/decentraland-scenes/Awesome-Repository/issues/new).
