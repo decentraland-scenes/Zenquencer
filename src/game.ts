@@ -54,9 +54,6 @@ class MusicalDrop extends Entity {
     this.anim = new AnimationState('ArmatureAction.001', { looping: false })
 
     this.addComponent(new Animator()).addClip(this.anim)
-
-    // needed to reference the entity from inside a component, because `this` in there refers to the component
-    let thisStone = this
   }
   public play(): void {
     this.getComponent(AudioSource).playOnce()
@@ -67,10 +64,10 @@ class MusicalDrop extends Entity {
   }
 }
 
-let drops: MusicalDrop[] = []
+const drops: MusicalDrop[] = []
 
 // lightweight storage of sequencer state
-let seqNumbers: number[][] = []
+const seqNumbers: number[][] = []
 
 // reusable stone class
 class Stone extends Entity {
@@ -94,7 +91,7 @@ class Stone extends Entity {
 
     this.index = index
 
-    let thisStone = this
+    const thisStone = this
 
     this.addComponent(
       new OnPointerDown(
@@ -127,7 +124,7 @@ class Stone extends Entity {
   }
 }
 
-let stones: Stone[] = []
+const stones: Stone[] = []
 
 // Base scene
 const base = new Entity()
@@ -150,8 +147,8 @@ pool.addComponent(
 )
 engine.addEntity(pool)
 
-let seqOffset = new Vector3(5, 0.3, 4)
-let seqLength = 16
+const seqOffset = new Vector3(5, 0.3, 4)
+const seqLength = 16
 
 // Kalimba sounds
 const kalimbaSounds: AudioClip[] = [
@@ -188,18 +185,18 @@ for (let beat = 0; beat < seqLength; beat++) {
 }
 
 //setRealm().then()
-updateStones()
+updateStones().catch((error) => log(error))
 
 async function updateStones() {
-  let currentStones = await getStones()
+  const currentStones = await getStones().catch((error) => log(error))
   if (!currentStones) return
 
   log(currentStones)
   for (let beat = 0; beat < currentStones.length; beat++) {
     for (let note = 0; note < currentStones[beat].length; note++) {
       seqNumbers[beat][note] = currentStones[beat][note]
-      let currentStone = stones[beat * 7 + note]
-      if (currentStones[beat][note] == 0) {
+      const currentStone = stones[beat * 7 + note]
+      if (currentStones[beat][note] === 0) {
         currentStone.stoneOn = false
 
         currentStone.drop.removeComponent(GLTFShape)
@@ -290,7 +287,7 @@ class PlaySequence implements ISystem {
 
         log('new loop')
       }
-      if (this.playingMode == 1) {
+      if (this.playingMode === 1) {
         // sequence mode
         for (let i = 0; i < 7; i++) {
           if (seqNumbers[this.currentBeat][i]) {
@@ -299,7 +296,7 @@ class PlaySequence implements ISystem {
         }
       } else {
         // random mode
-        let randomBeat = Math.floor(Math.random() * this.beats)
+        const randomBeat = Math.floor(Math.random() * this.beats)
         for (let i = 0; i < 7; i++) {
           if (seqNumbers[randomBeat][i]) {
             stones[randomBeat * 7 + i].drop.play()
@@ -311,19 +308,19 @@ class PlaySequence implements ISystem {
 }
 
 ///// Buttons
-let tube = new Entity()
+const tube = new Entity()
 tube.addComponent(
   new Transform({
     position: new Vector3(8, 0, 11.5),
     rotation: Quaternion.Euler(0, 270, 0),
   })
 )
-let energyAnimation = new AnimationState('Energy_Action', { looping: false })
+const energyAnimation = new AnimationState('Energy_Action', { looping: false })
 tube.addComponent(new Animator()).addClip(energyAnimation)
 tube.addComponent(resources.models.tube)
 engine.addEntity(tube)
 
-let linear = new Entity()
+const linear = new Entity()
 linear.addComponent(
   new Transform({
     position: new Vector3(-9.54, 1.48, 4.59),
@@ -342,7 +339,7 @@ linear.addComponent(
   )
 )
 
-let random = new Entity()
+const random = new Entity()
 random.addComponent(
   new Transform({
     position: new Vector3(-9.54, 1.49, 4.33),
@@ -361,7 +358,7 @@ random.addComponent(
   )
 )
 
-let slow2 = new Entity()
+const slow2 = new Entity()
 slow2.addComponent(
   new Transform({
     position: new Vector3(-9.54, 1.6, 4.59),
@@ -380,7 +377,7 @@ slow2.addComponent(
   )
 )
 
-let slow1 = new Entity()
+const slow1 = new Entity()
 slow1.addComponent(
   new Transform({
     position: new Vector3(-9.54, 1.6, 4.53),
@@ -399,7 +396,7 @@ slow1.addComponent(
   )
 )
 
-let neutral = new Entity()
+const neutral = new Entity()
 neutral.addComponent(
   new Transform({
     position: new Vector3(-9.54, 1.6, 4.47),
@@ -418,7 +415,7 @@ neutral.addComponent(
   )
 )
 
-let fast1 = new Entity()
+const fast1 = new Entity()
 fast1.addComponent(
   new Transform({
     position: new Vector3(-9.54, 1.6, 4.41),
@@ -437,7 +434,7 @@ fast1.addComponent(
   )
 )
 
-let fast2 = new Entity()
+const fast2 = new Entity()
 fast2.addComponent(
   new Transform({
     position: new Vector3(-9.54, 1.6, 4.35),
@@ -458,7 +455,7 @@ fast2.addComponent(
 
 sceneMessageBus.on('seqSpeed', (e) => {
   if (loopPlayer.playingMode) {
-    let newSpeed = e.speed * 4
+    const newSpeed = e.speed * 4
 
     log('new duration = ', newSpeed)
     loopPlayer.loopDuration = newSpeed
@@ -508,7 +505,7 @@ sceneMessageBus.on('seqSpeed', (e) => {
 })
 
 // start loop, w 8 second loops and with 16 beats
-let loopPlayer = new PlaySequence(8, loopDuration, 16)
+const loopPlayer = new PlaySequence(8, loopDuration, 16)
 engine.addSystem(loopPlayer)
 
 // we're hardcoding the player's realm, bc it can't be fetched while the scene is being loaded. Needs to be triggered after that.
@@ -527,8 +524,9 @@ async function getRealm() {
 }
 
 // external servers being used by the project - Please change these to your own if working on something else!
-let awsServer = 'https://genesis-plaza.s3.us-east-2.amazonaws.com/'
-let fireBaseServer = 'https://us-central1-genesis-plaza.cloudfunctions.net/app/'
+const awsServer = 'https://genesis-plaza.s3.us-east-2.amazonaws.com/'
+const fireBaseServer =
+  'https://us-central1-genesis-plaza.cloudfunctions.net/app/'
 
 // get latest sequencer state stored in server
 async function getStones(): Promise<number[][]> {
@@ -536,10 +534,10 @@ async function getStones(): Promise<number[][]> {
     // if (!playerRealm) {
     //   playerRealm = await getRealm()
     // }
-    let url = awsServer + 'sequencer/' + playerRealm + '/stones.json'
+    const url = awsServer + 'sequencer/' + playerRealm + '/stones.json'
     log('url used ', url)
-    let response = await fetch(url)
-    let json = await response.json()
+    const response = await fetch(url)
+    const json = await response.json()
     return json.stones
   } catch {
     log('error fetching from AWS server')
@@ -571,7 +569,7 @@ async function changeSequencer() {
 }
 
 // dummy entity to throttle the sending of change requests
-let seqChanger = new Entity()
+const seqChanger = new Entity()
 engine.addEntity(seqChanger)
 
 sceneMessageBus.on('showStone', (e) => {
@@ -584,11 +582,11 @@ sceneMessageBus.on('showStone', (e) => {
     stones[e.stone].drop.play()
   }
 
-  let note = e.stone % 7
-  let beat = Math.floor(e.stone / 7)
+  const note = e.stone % 7
+  const beat = Math.floor(e.stone / 7)
   log('beat ', beat, ' note ', note)
   seqNumbers[beat][note] = 1
-  changeSequencer()
+  changeSequencer().catch((error) => log(error))
 })
 
 sceneMessageBus.on('hideStone', (e) => {
@@ -597,8 +595,8 @@ sceneMessageBus.on('hideStone', (e) => {
 
   stones[e.stone].drop.removeComponent(GLTFShape)
 
-  let note = e.stone % 7
-  let beat = Math.floor(e.stone / 7)
+  const note = e.stone % 7
+  const beat = Math.floor(e.stone / 7)
   seqNumbers[beat][note] = 0
-  changeSequencer()
+  changeSequencer().catch((error) => log(error))
 })
